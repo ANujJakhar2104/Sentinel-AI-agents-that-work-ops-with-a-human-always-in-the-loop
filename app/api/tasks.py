@@ -38,7 +38,7 @@ def task_to_response(task: Task) -> TaskResponse:
         updated_at=task.updated_at,
         started_at=task.started_at,
         completed_at=task.completed_at,
-        metadata=task.metadata,
+        metadata=task.extra_metadata,
     )
 
 
@@ -61,7 +61,7 @@ async def create_task(
         input=task_data.input,
         priority=task_data.priority,
         task_type=task_data.task_type,
-        metadata=task_data.metadata or {},
+        extra_metadata=task_data.metadata or {},
     )
 
     db.add(task)

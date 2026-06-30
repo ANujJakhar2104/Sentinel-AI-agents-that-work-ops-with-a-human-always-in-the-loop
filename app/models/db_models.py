@@ -95,7 +95,7 @@ class Task(Base):
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
     # Metadata
-    metadata: Mapped[dict] = mapped_column(JSONB, default=dict)
+    extra_metadata: Mapped[dict] = mapped_column("metadata", JSONB, default=dict)
 
     # Relationships
     thoughts: Mapped[List["AgentThought"]] = relationship(
@@ -146,7 +146,7 @@ class AgentThought(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     # Additional Context
-    metadata: Mapped[dict] = mapped_column(JSONB, default=dict)
+    extra_metadata: Mapped[dict] = mapped_column("metadata", JSONB, default=dict)
 
     # Relationships
     task: Mapped["Task"] = relationship("Task", back_populates="thoughts")

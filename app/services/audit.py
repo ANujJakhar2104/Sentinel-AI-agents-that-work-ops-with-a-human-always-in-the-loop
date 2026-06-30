@@ -74,7 +74,7 @@ class AuditService:
             model=model,
             tokens_used=tokens_used,
             latency_ms=latency_ms,
-            metadata=metadata or {},
+            extra_metadata=metadata or {},
         )
 
         self.session.add(thought_record)

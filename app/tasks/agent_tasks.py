@@ -90,7 +90,7 @@ async def _process_task_async(task_id: str) -> Dict[str, Any]:
                 "input": task.input,
                 "task_id": str(task.id),
                 "priority": task.priority,
-                "metadata": task.metadata,
+                "metadata": task.extra_metadata,
                 "current_state": task.current_state,
                 "state_history": task.state_history,
                 "retry_count": task.retry_count,

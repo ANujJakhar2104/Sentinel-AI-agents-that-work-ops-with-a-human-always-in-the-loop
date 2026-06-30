@@ -63,7 +63,7 @@ async def get_task_thoughts(
                 tokens_used=t.tokens_used,
                 latency_ms=t.latency_ms,
                 created_at=t.created_at,
-                metadata=t.metadata,
+                metadata=t.extra_metadata,
             )
             for t in thoughts
         ],
