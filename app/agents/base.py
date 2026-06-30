@@ -1,5 +1,6 @@
 """Base agent class with ReAct pattern implementation"""
-
+import time
+import json
 from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any, List
 from datetime import datetime
@@ -188,13 +189,14 @@ class BaseAgent(ABC):
             latency_ms = int((time.time() - start_time) * 1000)
 
             # Log
+            _obs_for_log = observation.result if observation.success else observation.error
             await self.log_thought(
                 thought=action.reasoning,
                 action=action.action,
                 action_input=action.action_input,
-                observation=observation.result
-                if observation.success
-                else observation.error,
+                observation=json.dumps(_obs_for_log, default=str)
+                if isinstance(_obs_for_log, (dict, list))
+                else _obs_for_log,
                 latency_ms=latency_ms,
             )
 
