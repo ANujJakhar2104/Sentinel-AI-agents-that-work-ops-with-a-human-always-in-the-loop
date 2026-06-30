@@ -15,3 +15,4 @@ htmlcov/
 *.log
 celerybeat-schedule
 celerybeat.pid
+docker-compose.yml

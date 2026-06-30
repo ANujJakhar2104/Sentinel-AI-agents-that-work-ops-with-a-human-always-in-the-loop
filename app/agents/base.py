@@ -55,7 +55,7 @@ class BaseAgent(ABC):
         self.audit_service = audit_service
 
         if not self.api_key:
-            raise ValueError(f"OpenAI API key is required for {self.name}")
+            raise ValueError(f"LLM API key is required for {self.name}")
 
         self._llm = None
         self._max_iterations = 10
@@ -69,6 +69,7 @@ class BaseAgent(ABC):
                 model=self.model,
                 temperature=0,
                 api_key=self.api_key,
+                base_url=settings.llm_base_url or None,
             )
         return self._llm
 
