@@ -8,13 +8,11 @@ services:
       POSTGRES_DB: agentic_ops
     ports:
       - "5432:5432"
-
   # The Message Broker
   redis:
     image: redis:7
     ports:
       - "6379:6379"
-
   # Your API Application
   app:
     build: .
@@ -23,22 +21,29 @@ services:
       - .:/app
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/agentic_ops
       - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
     depends_on:
       - db
       - redis
-
   # The Celery Worker
   worker:
     build: .
     command: celery -A app.tasks.celery_app worker --loglevel=info
     volumes:
       - .:/app
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/agentic_ops
       - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
     depends_on:
       - db
       - redis
