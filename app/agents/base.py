@@ -206,6 +206,8 @@ class BaseAgent(ABC):
                 observation.result if observation.success else observation.error
             )
             current_context["iterations"] = iterations
+            if observation.success and isinstance(observation.result, dict):
+                current_context.update(observation.result)
 
             # Check for failure
             if not observation.success:
