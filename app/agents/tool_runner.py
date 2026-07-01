@@ -170,8 +170,18 @@ Always log execution details for audit compliance."""
                 tool_input[param_name] = context["user_id"]
             elif param_name == "order_id" and "order_id" in input_data:
                 tool_input[param_name] = input_data["order_id"]
+            
+        # Auto-fill common fields for send_email if missing
+        if hasattr(tool, 'name') and tool.name == "send_email":
+            if "subject" not in tool_input:
+                tool_input["subject"] = f"Update on your request"
+            if "body" not in tool_input:
+                tool_input["body"] = f"Your request has been processed. Order: {input_data.get('order_id', 'N/A')}. Amount: {input_data.get('amount', 'N/A')}."
+            if "user_id" not in tool_input:
+                tool_input["user_id"] = input_data.get("user_id", input_data.get("order_id", "unknown"))
 
         return tool_input
+
 
     async def _log_execution_start(
         self, tool_name: str, tool_input: Dict[str, Any]

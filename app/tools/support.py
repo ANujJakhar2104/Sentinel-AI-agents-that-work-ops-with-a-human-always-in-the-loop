@@ -31,20 +31,21 @@ class SendEmailTool(BaseTool):
                 "description": "Email addresses to CC",
             },
         },
-        "required": ["user_id", "subject", "body"],
+        "required": ["subject", "body"],
     }
 
     requires_approval = False
     allowed_roles = ["agent", "support_agent", "admin"]
     critical_on_failure = False
 
-    async def execute(
+        async def execute(
         self,
-        user_id: str,
-        subject: str,
-        body: str,
+        subject: str = "Notification",
+        body: str = "",
+        user_id: str = "unknown",
         template: str = None,
         cc: List[str] = None,
+        **kwargs,
     ) -> Dict[str, Any]:
         """
         Send email.
