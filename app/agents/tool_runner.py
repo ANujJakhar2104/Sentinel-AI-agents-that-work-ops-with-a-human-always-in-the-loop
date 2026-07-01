@@ -193,13 +193,16 @@ Always log execution details for audit compliance."""
         execution_id = uuid4()
 
         if self.audit_service:
-            await self.audit_service.log_tool_execution(
-                task_id=self.task_id,
-                tool_name=tool_name,
-                tool_input=tool_input,
-                execution_id=execution_id,
-                status=ToolExecutionStatus.EXECUTING,
-            )
+            try:
+                await self.audit_service.log_tool_execution(
+                    task_id=self.task_id,
+                    tool_name=tool_name,
+                    tool_input=tool_input,
+                    execution_id=execution_id,
+                    status=ToolExecutionStatus.EXECUTING,
+                )
+            except Exception as e:
+                logger.warning(f"Failed to log execution start: {e}")
 
         return execution_id
 
@@ -217,15 +220,18 @@ Always log execution details for audit compliance."""
         )
 
         if self.audit_service:
-            await self.audit_service.log_tool_execution(
-                task_id=self.task_id,
-                tool_name="unknown",
-                tool_input={},
-                execution_id=execution_id,
-                tool_output=result,
-                status=status,
-                error=error,
-            )
+            try:
+                await self.audit_service.log_tool_execution(
+                    task_id=self.task_id,
+                    tool_name="unknown",
+                    tool_input={},
+                    execution_id=execution_id,
+                    tool_output=result,
+                    status=status,
+                    error=error,
+                )
+            except Exception as e:
+                logger.warning(f"Failed to log execution complete: {e}")
 
     async def run(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """Run tool execution and return results"""
