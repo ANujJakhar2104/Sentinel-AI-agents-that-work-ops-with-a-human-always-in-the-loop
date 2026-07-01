@@ -194,10 +194,10 @@ Always log execution details for audit compliance."""
 
         if self.audit_service:
             await self.audit_service.log_tool_execution(
-                execution_id=execution_id,
                 task_id=self.task_id,
                 tool_name=tool_name,
                 tool_input=tool_input,
+                execution_id=execution_id,
                 status=ToolExecutionStatus.EXECUTING,
             )
 
