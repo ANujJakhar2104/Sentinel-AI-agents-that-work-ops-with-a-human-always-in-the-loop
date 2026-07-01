@@ -19,6 +19,12 @@ from app.tools.registry import register_all_tools
 logger = logging.getLogger(__name__)
 
 
+async def _dispose_engine():
+    """Dispose SQLAlchemy engine connections after each Celery task"""
+    from app.database import engine
+    await engine.dispose()
+
+
 def run_async(coro):
     """Run async function in sync context for Celery"""
     loop = asyncio.new_event_loop()
@@ -26,6 +32,10 @@ def run_async(coro):
     try:
         return loop.run_until_complete(coro)
     finally:
+        try:
+            loop.run_until_complete(_dispose_engine())
+        except Exception:
+            pass
         loop.close()
 
 
