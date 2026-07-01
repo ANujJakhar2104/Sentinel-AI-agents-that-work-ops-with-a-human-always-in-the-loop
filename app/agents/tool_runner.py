@@ -154,7 +154,10 @@ Always log execution details for audit compliance."""
 
     def _prepare_tool_input(self, tool, context: Dict[str, Any]) -> Dict[str, Any]:
         """Prepare input for a tool from context"""
+        # Input may be at top level or nested under context.input
         input_data = context.get("input", {})
+        if not input_data:
+            input_data = context.get("context", {}).get("input", {})
         tool_input = {}
 
         # Map context to tool parameters
