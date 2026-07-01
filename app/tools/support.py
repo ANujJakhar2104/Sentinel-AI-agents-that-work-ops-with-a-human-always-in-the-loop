@@ -1,5 +1,6 @@
 """Support tools for customer service operations"""
 
+from abc import abstractmethod
 from typing import Dict, Any, List
 import uuid
 from datetime import datetime
@@ -38,7 +39,7 @@ class SendEmailTool(BaseTool):
     allowed_roles = ["agent", "support_agent", "admin"]
     critical_on_failure = False
 
-        async def execute(
+    async def execute(
         self,
         subject: str = "Notification",
         body: str = "",
