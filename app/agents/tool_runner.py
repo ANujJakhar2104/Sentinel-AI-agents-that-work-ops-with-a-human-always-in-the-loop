@@ -152,23 +152,27 @@ Always log execution details for audit compliance."""
         input_data = context.get("input", {})
         if not input_data:
             input_data = context.get("context", {}).get("input", {})
-        tool_input = {}
+            
+        # 1. Start by copying ALL input data directly so we don't lose anything
+        tool_input = dict(input_data)
 
-        # Map context to tool parameters
-        for param_name, param_spec in tool.input_schema.get("properties", {}).items():
-            # Try to get from input first
+        # 2. Map context to tool parameters safely
+        schema_props = {}
+        if hasattr(tool, "input_schema") and isinstance(tool.input_schema, dict):
+            schema_props = tool.input_schema.get("properties", {})
+
+        for param_name, param_spec in schema_props.items():
             if param_name in input_data:
                 tool_input[param_name] = input_data[param_name]
-            # Try common variations
             elif param_name == "user_id" and "user_id" in context:
                 tool_input[param_name] = context["user_id"]
             elif param_name == "order_id" and "order_id" in input_data:
                 tool_input[param_name] = input_data["order_id"]
             
-        # Auto-fill common fields for send_email if missing
+        # 3. Auto-fill common fields for send_email if missing
         if hasattr(tool, 'name') and tool.name == "send_email":
             if "subject" not in tool_input:
-                tool_input["subject"] = f"Update on your request"
+                tool_input["subject"] = "Update on your request"
             if "body" not in tool_input:
                 tool_input["body"] = f"Your request has been processed. Order: {input_data.get('order_id', 'N/A')}. Amount: {input_data.get('amount', 'N/A')}."
             if "user_id" not in tool_input:
