@@ -62,7 +62,6 @@ Always log execution details for audit compliance."""
             action_input={
                 "tools": tools,
                 "tool_info": tool_info,
-                # YAHAN FIX HAI: Orchestrator se aaya hua context aage forward karo
                 "context": context.get("context", context)
             },
             reasoning=f"Executing {len(tools)} tools: {', '.join(tools)}",
@@ -230,17 +229,3 @@ Always log execution details for audit compliance."""
                 )
             except Exception as e:
                 logger.warning(f"Failed to log execution complete: {e}")
-
-    async def run(self, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Run tool execution and return results"""
-        action = await self.think(context)
-        observation = await self.act(action)
-
-        if observation.success:
-            return observation.result
-        else:
-            return {
-                "status": "error",
-                "error": observation.error,
-                "partial_results": self._execution_results,
-            }
