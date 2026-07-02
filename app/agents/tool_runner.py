@@ -59,7 +59,12 @@ Always log execution details for audit compliance."""
 
         return AgentAction(
             action="execute_tools",
-            action_input={"tools": tools, "tool_info": tool_info},
+            action_input={
+                "tools": tools,
+                "tool_info": tool_info,
+                # YAHAN FIX HAI: Orchestrator se aaya hua context aage forward karo
+                "context": context.get("context", context)
+            },
             reasoning=f"Executing {len(tools)} tools: {', '.join(tools)}",
         )
 
