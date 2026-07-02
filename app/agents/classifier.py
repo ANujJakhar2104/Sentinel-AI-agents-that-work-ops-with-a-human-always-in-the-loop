@@ -75,9 +75,9 @@ class ClassifierAgent(BaseAgent):
 
     @property
     def system_prompt(self) -> str:
-        return """You are a classification agent. Analyze requests and classify them accurately.
+        return """""You are a classification agent. Analyze requests and classify them accurately.
 Determine the task type, required tools, confidence level, and whether escalation is needed.
-Always respond with valid JSON."""
+Always respond with valid JSON."""""
 
     async def think(self, context: Dict[str, Any]) -> AgentAction:
         """Generate classification using LLM"""
