@@ -104,53 +104,42 @@ Always log execution details for audit compliance."""
     async def _execute_single_tool(
         self, tool_name: str, context: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """Execute a single tool with error handling"""
         logger.info(f"Executing tool: {tool_name}")
 
-        # Get tool from registry
         tool = ToolRegistry.get_tool(tool_name)
         if not tool:
-            return {
-                "tool": tool_name,
-                "success": False,
-                "error": f"Tool not found: {tool_name}",
-            }
-
-        # Prepare input from context
-        tool_input = self._prepare_tool_input(tool, context)
-
-        # Validate input
-        validation = tool.validate_input(tool_input)
-        if not validation.valid:
-            return {
-                "tool": tool_name,
-                "success": False,
-                "error": f"Invalid input: {validation.error}",
-            }
-
-        # Log tool execution start
-        execution_id = await self._log_execution_start(tool_name, tool_input)
+            return {"tool": tool_name, "success": False, "error": f"Tool not found: {tool_name}"}
 
         try:
-            # Execute tool
+            # 1. Check exactly what input is being generated
+            tool_input = self._prepare_tool_input(tool, context)
+            logger.info(f"[{tool_name}] Prepared input: {tool_input}")
+
+            # 2. Check if validation is failing silently
+            validation = tool.validate_input(tool_input)
+            if not validation.valid:
+                error_msg = str(getattr(validation, 'errors', 'Validation failed (no exact error provided)'))
+                logger.warning(f"[{tool_name}] Validation failed: {error_msg}")
+                return {
+                    "tool": tool_name,
+                    "success": False,
+                    "error": error_msg
+                }
+
+            execution_id = await self._log_execution_start(tool_name, tool_input)
+
+            # 3. Execute tool
+            logger.info(f"[{tool_name}] Starting execution...")
             result = await tool.execute(**tool_input)
+            logger.info(f"[{tool_name}] Execution successful: {result}")
 
-            # Log success
             await self._log_execution_complete(execution_id, result)
-
             return {"tool": tool_name, "success": True, "result": result}
+            
         except Exception as e:
-            logger.error(f"Tool execution failed: {tool_name} - {e}")
-
-            # Log failure
-            await self._log_execution_complete(execution_id, None, str(e))
-
-            return {
-                "tool": tool_name,
-                "success": False,
-                "error": str(e),
-                "critical": tool.critical_on_failure,
-            }
+            # exc_info=True se pura stack trace (line number ke sath) print hoga
+            logger.error(f"[{tool_name}] Tool execution crashed: {str(e)}", exc_info=True)
+            return {"tool": tool_name, "success": False, "error": str(e)}
 
     def _prepare_tool_input(self, tool, context: Dict[str, Any]) -> Dict[str, Any]:
         """Prepare input for a tool from context"""
